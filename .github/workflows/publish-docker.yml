@@ -37,9 +37,15 @@ jobs:
     steps:
       - name: Resolve latest upstream release
         id: latest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          LATEST=$(curl -fsSL "https://api.github.com/repos/${UPSTREAM_REPO}/releases/latest" \
-            | jq -r .tag_name | sed 's/^v//')
+          set -euo pipefail
+          LATEST=$(gh api repos/${UPSTREAM_REPO}/releases/latest --jq .tag_name | sed 's/^v//')
+          if ! printf '%s' "$LATEST" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+'; then
+            echo "::error::Could not resolve upstream latest tag (got '$LATEST')"
+            exit 1
+          fi
           echo "version=$LATEST" >> "$GITHUB_OUTPUT"
           echo "latest=$LATEST"
 
@@ -48,12 +54,18 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
           VERSION="${{ inputs.version }}"
+          VERSION="${VERSION#v}"
           IS_LATEST=true
           if [ -z "$VERSION" ]; then
             VERSION="${{ steps.latest.outputs.version }}"
           else
             IS_LATEST=false
+          fi
+          if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+'; then
+            echo "::error::Invalid version '$VERSION'"
+            exit 1
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "is_latest=$IS_LATEST" >> "$GITHUB_OUTPUT"
