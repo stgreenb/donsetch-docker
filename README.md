@@ -1,5 +1,13 @@
 # donsetch-docker
 
+> **Archived (Nov 24, 2026) — packaging was upstreamed.** Upstream [DonSeTch](https://github.com/dondai44423/donsetch)
+> publishes multi-arch images itself since `v5.5.11`: **`ghcr.io/dondai44423/donsetch`** (`:latest`, `:5`, `:5.5`, patch tags),
+> built from the gated, SHA-256-verified release binaries. Use the official image; this repo is kept only as a
+> reference implementation of release→GHCR packaging (and a fond memory of covering `5.5.9`–`5.5.10`,
+> see issue [#469](https://github.com/dondai44423/donsetch/issues/469)).
+> Note: the official image's default Cmd is stdio — pass `donsetch mcp --http --host 0.0.0.0 --port 8765`
+> (or `DONSETCH_TRANSPORT__KIND=http`) for HTTP MCP.
+
 Packaging-only repository: turns upstream [DonSeTch](https://github.com/dondai44423/donsetch)
 GitHub releases into multi-arch GHCR container images. No source is built
 here — the workflow downloads the release tarballs, verifies the `.sha256`
